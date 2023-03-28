@@ -7,8 +7,8 @@ const categoryroute = require('./src/routes/category')
 const productRoute = require('./src/routes/product')
 const billRoute = require('./src/routes/bill')
 const dashboardRoute = require('./src/routes/dashboard')
-const { requestLogger, errorLogger } = require('./src/utilities/logger')
-const router = express.Router();
+const { requestLogger, errorLogger, cfsLogger, logObject } = require('./src/utilities/logger')
+
 const app = express();
 
 
@@ -16,10 +16,6 @@ const app = express();
 app.use(bodyparser.json())
 app.use(cors());
 
-app.use('/', (req, res,next) => {
-    console.log("routes are working")
-    next();
-})
 
 //Logging request
 // app.use(requestLogger);
@@ -37,5 +33,5 @@ const connection = require('./src/connection');
 
 
 app.listen(process.env.PORT, () => {
-    console.log(`server started on ${process.env.PORT}`)
+    cfsLogger.info(logObject("App.Listen", `Started listening on ${process.env.PORT}`))
 })
