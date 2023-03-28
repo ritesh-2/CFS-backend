@@ -34,10 +34,12 @@ router.post('/signup', (req, res, next) => {
 router.post('/login', (req, res, next) => {
 
     try {
+        console.log("Inside /login ");
         const user = req.body;
         const query = "select email,password,role,status from user where email = ?"
         const params = [user.email];
         connection.query(query, params, (err, result) => {
+            console.log(`After exevuting qury of login err-> ${err}, result-> ${result} `)
             if (err) return next(createHttpError.InternalServerError(err));
             if (result.length <= 0 || result[0].password != user.password) {
                 return next(createHttpError.Unauthorized("Invalid User Credentials..!"))
@@ -58,6 +60,7 @@ router.post('/login', (req, res, next) => {
             }
         })
     } catch (err) {
+        console.log(`Error in /login ${err}`)
         next(err)
     }
 
