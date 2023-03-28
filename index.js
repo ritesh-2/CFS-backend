@@ -22,7 +22,7 @@ app.use('/', (req, res,next) => {
 })
 
 //Logging request
-app.use(requestLogger);
+// app.use(requestLogger);
 
 app.use('/user', userRoute)
 app.use('/dashboard', dashboardRoute)
