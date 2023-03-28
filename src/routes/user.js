@@ -4,17 +4,23 @@ const connection = require('../connection')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer');
 const { verifyAccesstoken } = require('../utilities/jwt_helper');
-const Utils = require('../utilities/utils')
+const Utils = require('../utilities/utils');
+const { cfsLogger, logObject } = require('../utilities/logger');
 
 const router = express.Router();
 
 
 router.post('/signup', (req, res, next) => {
+    let logSource = "router - post - /signup"
     try {
+
+        cfsLogger.debug(logObject(logSource, "ENTRY"))
+
         const user = req.body;
         const params = [user.email]
         const query = "select email,password,role,status from user where email = ?";
         connection.query(query, params, (err, result) => {
+            cfsLogger.debug(logObject(logSource, `After executing ${query} err  => ${!!err} result ${!!res}`))
             if (err) return next(createHttpError.InternalServerError("Error from DB script select"));
             if (result.length > 0) return next(createHttpError(400, "Email already Exist..!"));
             const insertQuery = "insert into user(name,contactNumber,email,password,status,role) values(?,?,?,?,'false','user')";
@@ -25,21 +31,23 @@ router.post('/signup', (req, res, next) => {
             })
         })
 
+        cfsLogger.debug(logObject(logSource, "EXIT"))
     }
     catch (err) {
+        cfsLogger.error(logObject(logSource, err))
         next(err);
     }
 })
 
 router.post('/login', (req, res, next) => {
-
+    let logSource = "router - post - /login"
     try {
-        console.log("Inside /login ");
+        cfsLogger.debug(logObject(logSource, "ENTRY"))
         const user = req.body;
         const query = "select email,password,role,status from user where email = ?"
         const params = [user.email];
         connection.query(query, params, (err, result) => {
-            console.log(`After exevuting qury of login err-> ${err}, result-> ${result} `)
+            cfsLogger.debug(logObject(logSource, `After executing ${query} err  => ${!!err} result ${!!res}`))
             if (err) return next(createHttpError.InternalServerError(err));
             if (result.length <= 0 || result[0].password != user.password) {
                 return next(createHttpError.Unauthorized("Invalid User Credentials..!"))
@@ -59,8 +67,9 @@ router.post('/login', (req, res, next) => {
                 return next(createHttpError.InternalServerError())
             }
         })
+        cfsLogger.debug(logObject(logSource, "EXIT"))
     } catch (err) {
-        console.log(`Error in /login ${err}`)
+        cfsLogger.error(logObject(logSource, err))
         next(err)
     }
 
@@ -95,7 +104,7 @@ router.post('/forgotpassword', (req, res, next) => {
                         return res.status(200).json({ message: "password sent successfully to your email" });
                     }
                 })
-               
+
             }
         })
     } catch (err) {
@@ -113,7 +122,7 @@ router.patch('/update', verifyAccesstoken, Utils.checkRole, (req, res, next) => 
             if (result.affectedRows == 0) {
                 return next(createHttpError(400, "User ID does not exist..!"))
             }
-            return res.status(200).json({message: "User updated successfully..!"});
+            return res.status(200).json({ message: "User updated successfully..!" });
         })
     } catch (err) {
         next(err)
@@ -135,7 +144,7 @@ router.get('/get', verifyAccesstoken, Utils.checkRole, (req, res, next) => {
 
 })
 
-router.post('/changePassword', verifyAccesstoken,(req, res, next) => {
+router.post('/changePassword', verifyAccesstoken, (req, res, next) => {
     try {
         const user = req.body;
         const email = res.locals.email;
