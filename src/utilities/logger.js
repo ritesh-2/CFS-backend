@@ -2,6 +2,7 @@
 require('dotenv').config();
 const { createLogger, format, transports, json } = require('winston');
 const { combine, prettyPrint, printf, timestamp } = format;
+const { MongoDB }  = require('winston-mongodb')
 
 const logObject = (source, logMsg) => {
     try {
@@ -59,6 +60,17 @@ const intialiseLogger = () => {
     if (process.env.ENABLE_CONSOLE_LOGGER === "true") {
         const consoleLoggerTrasnport = new transports.Console();
         logger.add(consoleLoggerTrasnport);
+    }
+
+    if(process.env.ENABLE_DB_LOGGER === "true"){
+        const mongoDBTrasnport = new transports.MongoDB({
+            db: process.env.LOGGER_DB_STRING,
+            level:"error",
+            options: {useUnifiedTopology: true},
+            collection:'cfs_logs'
+        }) 
+
+        logger.add(mongoDBTrasnport);
     }
 
     return logger;
