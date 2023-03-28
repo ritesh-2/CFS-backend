@@ -23,7 +23,7 @@ const logObject = (source, logMsg) => {
 
 const errorLogger = (err, req, res, next) => {
     // let errMessage = `${new Date()} - ${err.stack}\n`;
-    cfsLogger.error(err.stack);
+    cfsLogger.error(err.message ?? err.stack);
     res.status(err.status || 500)
     res.json({
         status: err.status || 500,
