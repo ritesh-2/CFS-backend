@@ -16,8 +16,9 @@ const app = express();
 app.use(bodyparser.json())
 app.use(cors());
 
-router.get('/test', (req, res) => {
+app.use('/', (req, res,next) => {
     console.log("routes are working")
+    next();
 })
 
 //Logging request
