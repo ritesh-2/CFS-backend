@@ -26,6 +26,7 @@ router.post('/signup', (req, res, next) => {
             const insertQuery = "insert into user(name,contactNumber,email,password,status,role) values(?,?,?,?,'false','user')";
             const insertParams = [user.name, user.contactNumber, user.email, user.password];
             connection.query(insertQuery, insertParams, (err, result) => {
+                cfsLogger.debug(logObject(logSource, `After executing ${insertQuery} err  => ${!!err} result ${!!result}`))
                 if (err) return next(createHttpError.InternalServerError());
                 return res.status(200).json({ message: "Successfully Registered..!" })
             })

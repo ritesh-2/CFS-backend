@@ -4,7 +4,7 @@ const connection = require('../connection');
 const { verifyAccesstoken } = require('../utilities/jwt_helper');
 const router = express.Router();
 const Utils = require('../utilities/utils')
-
+const { cfsLogger , logObject } = require('../utilities/logger')
 
 router.post('/add', verifyAccesstoken, Utils.checkRole, (req, res, next) => {
     let logSource = "router - post - /add"
