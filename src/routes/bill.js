@@ -9,7 +9,7 @@ const pdf = require('html-pdf')
 const path = require('path')
 const fs = require('fs')
 const uuid = require('uuid')
-
+const { cfsLogger , logObject } = require('../utilities/logger')
 
 router.post('/generateReport', verifyAccesstoken, (req, res, next) => {
     let logSource = "router - post - /generateReport"
