@@ -26,32 +26,33 @@ router.post('/generateReport', verifyAccesstoken, (req, res, next) => {
             cfsLogger.debug(logObject(logSource, `After executing ${query} err  => ${!!err} result ${!!result}`))
 
             if (err) return next(createHttpError.InternalServerError(err));
-            ejs.renderFile(path.join(__dirname, '', 'report.ejs'),
-                {
-                    productDetails: productDetails,
-                    name: orderDetails.name,
-                    email: orderDetails.email,
-                    contactNumber: orderDetails.contactNumber,
-                    paymentMethod: orderDetails.paymentMethod,
-                    totalAmount: orderDetails.totalAmount,
+            else return res.status(200).json({ uuid: uid })
+            // ejs.renderFile(path.join(__dirname, '', 'report.ejs'),
+            //     {
+            //         productDetails: productDetails,
+            //         name: orderDetails.name,
+            //         email: orderDetails.email,
+            //         contactNumber: orderDetails.contactNumber,
+            //         paymentMethod: orderDetails.paymentMethod,
+            //         totalAmount: orderDetails.totalAmount,
 
-                }, (error, data) => {
+            //     }, (error, data) => {
 
-                    cfsLogger.debug(logObject(logSource, `Response recived at ejs.renderfile error => ${!!error} and data => ${!!data}`))
+            //         cfsLogger.debug(logObject(logSource, `Response recived at ejs.renderfile error => ${!!error} and data => ${!!data}`))
 
-                    if (error) return (next(createHttpError.InternalServerError(error)))
-                    pdf.create(data).toFile('./generate_pdf/' + uid + ".pdf", (err2, data2) => {
-                        cfsLogger.debug(logObject(logSource, `Response recived at+ pdf.create error => ${!!err2} and data => ${!!data2}`))
-                        if (err2) {
-                            console.log(err2)
-                            return next(createHttpError.InternalServerError(err2))
-                        }
-                        else {
-                            return res.status(200).json({ uuid: uid })
-                        }
+            //         if (error) return (next(createHttpError.InternalServerError(error)))
+            //         pdf.create(data).toFile('./generate_pdf/' + uid + ".pdf", (err2, data2) => {
+            //             cfsLogger.debug(logObject(logSource, `Response recived at+ pdf.create error => ${!!err2} and data => ${!!data2}`))
+            //             if (err2) {
+            //                 console.log(err2)
+            //                 return next(createHttpError.InternalServerError(err2))
+            //             }
+            //             else {
+            //                 return res.status(200).json({ uuid: uid })
+            //             }
 
-                    })
-                })
+            //         })
+            //     })
         })
         cfsLogger.debug(logObject(logSource, "EXIT"))
     } catch (err) {
