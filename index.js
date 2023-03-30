@@ -17,8 +17,6 @@ app.use(bodyparser.json())
 app.use(cors());
 
 
-//Logging request
-// app.use(requestLogger);
 
 app.use('/user', userRoute)
 app.use('/dashboard', dashboardRoute)
