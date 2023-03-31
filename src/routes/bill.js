@@ -9,7 +9,7 @@ const pdf = require('html-pdf')
 const path = require('path')
 const fs = require('fs')
 const uuid = require('uuid')
-const { cfsLogger , logObject } = require('../utilities/logger')
+const { cfsLogger , logObject } = require('../utilities/logger');
 
 router.post('/generateReport', verifyAccesstoken, (req, res, next) => {
     let logSource = "router - post - /generateReport"
@@ -108,12 +108,21 @@ router.post('/getPdf', verifyAccesstoken, (req, res, next) => {
 
 })
 
-router.get('/getBills', verifyAccesstoken, (req, res, next) => {
+router.get('/getBills', verifyAccesstoken,(req, res, next) => {
     let logSource = "router - get - /getBills"
     try {
-        cfsLogger.debug(logObject(logSource, "ENTRY")) 
-        const query = "select * from  bill order by id DESC"
-        connection.query(query, (err, result) => {
+        cfsLogger.debug(logObject(logSource, "ENTRY"))
+        let query = null; 
+        let param = null;
+        if(res.locals && res.locals.role && res.locals.role === 'admin'){
+             query = "select * from  bill order by id DESC"
+        }
+        else{
+             query = `select * from  bill where email = ? order by id DESC `
+             param = res.locals.email
+        }
+       
+        connection.query(query,[param], (err, result) => {
             cfsLogger.debug(logObject(logSource, `After executing ${query} err  => ${!!err} result ${!!result}`))
             if (err) return next(createHttpError.InternalServerError(err));
             return res.status(200).json(result)
@@ -126,6 +135,25 @@ router.get('/getBills', verifyAccesstoken, (req, res, next) => {
     }
 
 })
+
+// router.get('/getBills', verifyAccesstoken, Utils.checkRole ,(req, res, next) => {
+//     let logSource = "router - get - /getBills"
+//     try {
+//         cfsLogger.debug(logObject(logSource, "ENTRY")) 
+//         const query = "select * from  bill order by id DESC"
+//         connection.query(query, (err, result) => {
+//             cfsLogger.debug(logObject(logSource, `After executing ${query} err  => ${!!err} result ${!!result}`))
+//             if (err) return next(createHttpError.InternalServerError(err));
+//             return res.status(200).json(result)
+
+//         })
+//         cfsLogger.debug(logObject(logSource, "EXIT")) 
+//     } catch (err) {
+//         cfsLogger.error(logObject(logSource, err))
+//         next(err);
+//     }
+
+// })
 
 router.delete('/delete/:id', verifyAccesstoken, (req, res, next) => {
     let logSource = "router - delete - /delete/:id"
